@@ -1,0 +1,33 @@
+name: Update Harga Emas Otomatis
+
+on:
+  schedule:
+    # Berjalan setiap hari jam 03:00 UTC (Sama dengan jam 10:00 WIB)
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Memungkinkan Anda menjalankan manual kapan saja
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Jalankan Scraper
+        run: python update_emas.py
+
+      - name: Simpan Hasil ke Repo
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add harga_emas.json
+          git commit -m "Update harga emas otomatis: $(date)" || exit 0
+          git push
